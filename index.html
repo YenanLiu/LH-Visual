@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore two LongVisBench pilot cases where GPT-6 Astra fell short of completing microscopy tracking tasks, including tool use and final scores.">
+  <title>LongVisBench Pilot Study</title>
+  <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <script src="gallery.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#lineage">LongVis<span>Bench</span></a>
+    <nav class="case-switch" aria-label="Select a case">
+      <a href="#lineage">Cell lineage</a>
+      <a href="#mitosis">Cell contact &amp; division</a>
+    </nav>
+    <span class="status">Pilot study</span>
+  </header>
+  <main>
+    <div id="error" class="error" role="alert" hidden></div>
+    <section class="study panel" aria-labelledby="study-title">
+      <div class="study-copy">
+        <h1 id="study-title">LongVisBench Pilot Study</h1>
+        <p>Can visual agents preserve cell identity through contact and division? We tested GPT-6 Astra on microscopy tracking with CPU tools and with specialist assistance. In the two cases shown here, none of the archived runs passed every grading check.</p>
+        <p class="fine">Ground truth is available in the viewer to inspect and score the recorded submissions.</p>
+      </div>
+      <div class="study-model">
+        <p class="eyebrow">Evaluated model</p>
+        <strong>GPT-6 Astra</strong>
+      </div>
+    </section>
+    <section id="case-panel" class="case-panel" aria-labelledby="case-title" hidden>
+      <div class="sectionbar">
+        <div><p id="case-source" class="eyebrow"></p><h2 id="case-title" class="section-title"></h2></div>
+        <a class="button" href="#replay" id="jump-replay">Jump to replay ↓</a>
+      </div>
+      <div class="task-layout">
+        <section class="panel" aria-labelledby="input-title">
+          <div class="panel-head">
+            <h2 id="input-title">Task data</h2>
+            <a id="dataset-link" class="small-link" target="_blank" rel="noopener noreferrer">Source dataset ↗</a>
+          </div>
+          <div class="input-view" id="input-view">
+            <div class="input-media">
+              <img id="source-image" alt="Task input" decoding="async">
+              <svg id="overlay" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"></svg>
+            </div>
+          </div>
+          <div class="input-controls">
+            <div class="slider-row">
+              <button id="source-prev" type="button" aria-label="Previous input">←</button>
+              <input id="frame-index" aria-label="Select a frame" type="range" min="0" step="1">
+              <button id="source-next" type="button" aria-label="Next input">→</button>
+              <output id="frame-label" for="frame-index"></output>
+            </div>
+            <div class="overlay-row">
+              <label><input type="checkbox" id="show-gt" checked><i class="swatch gt"></i>Ground truth</label>
+              <label><input type="checkbox" id="show-answer" checked><i class="swatch answer"></i>Selected run output</label>
+              <label id="root-control" hidden>Lineage <select id="root-filter" aria-label="Filter lineage identity"></select></label>
+              <a id="frame-link" target="_blank" rel="noopener noreferrer" class="small-link">Open frame ↗</a>
+            </div>
+            <p class="fine" id="input-note"></p>
+          </div>
+        </section>
+        <aside class="panel instructions" aria-labelledby="instruction-title">
+          <div class="panel-head"><h2 id="instruction-title">Original task</h2></div>
+          <div class="panel-body">
+            <p class="task-text" id="task-text"></p>
+            <p class="difficulty"><strong>Challenge</strong> <span id="task-difficulty"></span></p>
+            <div class="data-links">
+              <a id="task-link" target="_blank" rel="noopener noreferrer">Task JSON ↗</a>
+              <a id="gt-link" target="_blank" rel="noopener noreferrer">Ground truth JSON ↗</a>
+            </div>
+            <details><summary>Output schema and grading rules</summary><pre id="task-schema"></pre></details>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="replay" class="replay" aria-labelledby="replay-title" hidden>
+      <div class="sectionbar">
+        <div><p class="eyebrow">Recorded runs</p><h2 id="replay-title" class="section-title">Execution replay</h2></div>
+        <p class="fine">Select a run, then select a step to inspect its input and output.</p>
+      </div>
+      <div class="panel run-list">
+        <table>
+          <thead><tr><th scope="col">Setting</th><th scope="col">Run</th><th scope="col">Actions</th><th scope="col">Specialist calls</th><th scope="col">Score</th><th scope="col">Outcome</th></tr></thead>
+          <tbody id="runs"></tbody>
+        </table>
+      </div>
+      <div id="run-panel" class="trace-layout" hidden>
+        <aside class="panel timeline" aria-labelledby="steps-title">
+          <div class="panel-head"><h3 id="steps-title">Execution steps</h3><span id="step-count" class="fine"></span></div>
+          <div id="steps" aria-label="Recorded steps"></div>
+        </aside>
+        <section class="panel step-view" aria-labelledby="step-title">
+          <div class="panel-head">
+            <h3 id="step-title"></h3>
+            <div class="step-tools">
+              <button id="prev-step" aria-label="Previous step" type="button">←</button>
+              <button id="next-step" aria-label="Next step" type="button">→</button>
+            </div>
+          </div>
+          <div class="panel-body">
+            <p class="fine" id="step-note" hidden></p>
+            <div class="observations" id="step-images"></div>
+            <details id="step-inputs" hidden><summary id="input-summary"></summary><div class="observations input-observations" id="step-input-images"></div></details>
+            <details id="step-request"><summary>Recorded tool request</summary><pre id="request-json"></pre></details>
+            <details id="step-response"><summary>Recorded tool response</summary><pre id="response-json"></pre></details>
+          </div>
+        </section>
+      </div>
+      <section id="result-panel" class="panel results" aria-labelledby="results-title" hidden>
+        <div class="panel-head"><h3 id="results-title">Final submission and score</h3><a id="trace-link" target="_blank" rel="noopener noreferrer" class="small-link">Execution trace JSON ↗</a></div>
+        <div class="panel-body">
+          <div id="metrics" class="metrics"></div>
+          <div class="result-tabs" role="group" aria-label="Select evidence">
+            <button data-evidence="answer" type="button" aria-pressed="true">Final answer</button>
+            <button data-evidence="truth" type="button" aria-pressed="false">Ground truth</button>
+            <button data-evidence="evaluation" type="button" aria-pressed="false">Grader output</button>
+          </div>
+          <pre id="result-json"></pre>
+        </div>
+      </section>
+    </section>
+  </main>
+</body>
+</html>
